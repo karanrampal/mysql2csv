@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Test mysql"""
+"""Read mysql database and save the tables as csv files"""
 
+import os
 import argparse
 import sys
 import getpass
 import mysql.connector as mysql
 import pandas as pd
+from utils import mkdir_safe
 
 def args_parse():
     """Parse command line arguments
@@ -20,9 +22,13 @@ def args_parse():
                         default="localhost",
                         help="Server location")
     parser.add_argument('-d',
-                        '--data_path',
+                        '--database',
                         default="ml_mimo",
-                        help="Directory containing the database")
+                        help="Name of the database")
+    parser.add_argument('-o',
+                        '--output_dir',
+                        default="./",
+                        help="Directory to write the table csv files")
     return parser.parse_args()
 
 def main():
@@ -30,18 +36,31 @@ def main():
     """
     args = args_parse()
 
+    # Get password for the mysql server
     try:
         password = getpass.getpass()
     except ValueError as error:
         sys.exit('Error: {0}'.format(error))
 
+    # Connect to the mysql server using python-db api
     cnx = mysql.connect(user=args.username,
                         password=password,
                         host=args.hostname,
-                        database=args.data_path)
+                        database=args.database)
 
-    events_df = pd.read_sql("SELECT * FROM events", cnx)
-    print(events_df.head())
+    # Tables to read from the database
+    tables = ['cells', 'headers', 'events']
+
+    mkdir_safe(args.output_dir)
+
+    for table in tables:
+        print("Reading {0} table ...".format(table))
+        data_frame = pd.read_sql("SELECT * FROM {0}".format(table), cnx)
+
+        print("Writing {0} table ...".format(table))
+        data_frame.to_csv(os.path.join(args.output_dir, table + '.csv'))
+
+    print("Done ...")
 
     cnx.close()
 
