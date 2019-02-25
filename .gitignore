@@ -10,3 +10,6 @@ dist/
 
 # Data directory
 data/
+
+# Visual studio code settings
+.vscode/
