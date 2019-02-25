@@ -59,6 +59,9 @@ def main():
 
         print("Writing {0} table ...".format(table))
         data_frame.to_csv(os.path.join(args.output_dir, table + '.csv'))
+        #data_frame.to_parquet(os.path.join(args.output_dir, table + '.parquet'),
+        #                      engine='pyarrow',
+        #                      compression=None)
 
     print("Done ...")
 
