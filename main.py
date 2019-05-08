@@ -23,7 +23,7 @@ def args_parse():
                         help="Server location")
     parser.add_argument('-d',
                         '--database',
-                        default="ml_mimo",
+                        default="ml_mimo_20190508",
                         help="Name of the database")
     parser.add_argument('-o',
                         '--output_dir',
@@ -49,7 +49,7 @@ def main():
                         database=args.database)
 
     # Tables to read from the database
-    tables = ['cells', 'headers', 'events']
+    tables = ['cells', 'headers', 'events', 'events_calls']
 
     mkdir_safe(args.output_dir)
 
@@ -59,9 +59,9 @@ def main():
 
         print("Writing {0} table ...".format(table))
         data_frame.to_csv(os.path.join(args.output_dir, table + '.csv'))
-        #data_frame.to_parquet(os.path.join(args.output_dir, table + '.parquet'),
-        #                      engine='pyarrow',
-        #                      compression=None)
+        data_frame.to_parquet(os.path.join(args.output_dir, table + '.parquet'),
+                              engine='pyarrow',
+                              compression=None)
 
     print("Done ...")
 
